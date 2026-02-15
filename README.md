@@ -24,6 +24,7 @@ a similar program for creating Windows images for embedded devices: https://gith
 ## roadmap
 * gui with system settings and choice of platforms for export
 * export for single-board orange pi and raspberry pi computers
+* x11 support (currently only wayland is supported)
 
 ## supported host systems
 * debian
@@ -41,6 +42,7 @@ a similar program for creating Windows images for embedded devices: https://gith
 * ctrl+alt+del in the linux kernel (kernel source patch)
 * switching VT (kernel source patch + configs)
 * sysrq (kernel source patch)
+* control flow & kerboard echo (it's just turned off by default in tty mode. you can enable)
 
 ## used kernel patches (from https://github.com/igorkll/linux-embedded-patchs)
 * disable_vt_swithing_from_keyboard.patch - prevents the possibility of switching VT from the keyboard
@@ -55,6 +57,7 @@ a similar program for creating Windows images for embedded devices: https://gith
 * resources/files - files that will be copied to rootfs before executing chroot scripts. please note that all your files and directories from this directory will have rights 755 and belong to root, regardless of what rights they have during the build. this is necessary for repeatable assembly on different machines. if you need to change the permissions on the target system, use the "chroot" scripts.
 * resources/chroot - scripts executed inside a chroot in the system during the build process (not just a chroot, but a systemd-nspawn container) please note that at the end of each file you need to create an empty file or directory with the path "/.chrootend" otherwise the build will fail
 * resources/runshell.sh - the shell startup file. you can write a script directly in it if you use tty mode and you will just get console output, or you can run your application from it if you use wayland/x11
+* resources/preinit.sh - this script runs before the initialization system in the initramfs environment. at this point, the switch_root has not yet occurred and the real root is mounted in "/root"
 * resources/logo.png - the logo that will be used when uploading with splash enabled
 * output - the finished result of the build
 * .temp - temporary files used during the build process
@@ -73,10 +76,11 @@ a similar program for creating Windows images for embedded devices: https://gith
 ## notes
 * please note that by default, the first time you turn on the created root image, the partition will be enlarged to the maximum possible size for the current media. this is done because I cannot know what size of drive the *.img image will be written to
 * by default, the allow_updatescript feature from custom-debian-init-script is enabled. to understand how it works, read this: https://github.com/igorkll/custom-debian-initramfs-init
-* in the "tty" mode if your script is runshell.sh when is completed, it will automatically restart. However, this does not happen in graphical mode.
-* It is always necessary to reboot and turn off the device from the you shell via "shutdown --no-wall now" and "reboot --no-wall", the --no-wall argument is REQUIRED so that the shutdown process is not visible when turned off.
+* if your script is runshell.sh when is completed, it will automatically restart. (not working in session mode "init")
+* It is always necessary to reboot and turn off the device from the you shell via "shutdown --no-wall now" and "shutdown --no-wall -r now", the --no-wall argument is REQUIRED so that the shutdown process is not visible when turned off.
 * the /var directory is mounted as tmpfs
-* The .img images for x86 / x86_64 that Gnubox maker generates are universal. they can be written to a USB drive or to a hard disk/SSD. also, when the device is turned on for the first time, the partition size will increase to the maximum possible (up to the entire available disk space) so that the OS can use all available space.
+* The .img images for x86 / x86_64 that Gnubox maker generates are universal. they can be written to a USB drive or to a hard disk/SSD.
+* if session_mode init is set then runshell.sh in fact, it will be an init system, you do everything yourself. and it will always be run from root
 
 ## what should I do if the project build fails?
 * make sure that EACH of your chroot scripts creates a /.chrootend file at the end
