@@ -23,8 +23,13 @@ a similar program for creating Windows images for embedded devices: https://gith
 
 ## roadmap
 * gui with system settings and choice of platforms for export
-* export for single-board orange pi and raspberry pi computers
 * x11 support (currently only wayland is supported)
+
+## supported platforms
+* x86_64 (BIOS, UEFI)
+* x86 (BIOS, UEFI)
+* orange pi zero 3
+* raspberry pi 5/4/3 (i tested this on raspberry pi 5, but in theory the image created via raspberry pi 64 should work on 5/4/3)
 
 ## supported host systems
 * debian
@@ -71,7 +76,6 @@ a similar program for creating Windows images for embedded devices: https://gith
 * "chroot" is executed in systemd-nspawn
 * Attention! since the gnubox maker projects are building from root in the host system, be careful what you build
 * despite the presence of command-line arguments for building via tty, gnubox maker must BE run from its working directory (otherwise it will not work)
-* for reasons unknown to me, in the "wayland" mode, if the "root" user is installed and you are from runshell.sh run weston-terminal, then it will run the same script, which will lead to recursion...
 
 ## notes
 * please note that by default, the first time you turn on the created root image, the partition will be enlarged to the maximum possible size for the current media. this is done because I cannot know what size of drive the *.img image will be written to
@@ -89,3 +93,9 @@ a similar program for creating Windows images for embedded devices: https://gith
 * restart your computer and try again
 * delete the directories .temp and output (clear the temporary project files) and try again
 * try to build a project from the examples of gnubox maker, and if it is going to, then the problem is in your project. If not, it's possible that there are some dependencies missing or your host system is not supported
+
+## how do I rebuild kernels in the gnubox maker program?
+* local kernel rebuild for the project is not supported yet.
+* you need to change the source code of the program
+* open the gnuboxmaker/kernel_build directory and build kernel_build.json via syslbuild
+* delete all contents of gnuboxmaker/kernel_image and replace with gnuboxmaker/kernel_build/output
