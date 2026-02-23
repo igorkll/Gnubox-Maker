@@ -28,6 +28,11 @@ a similar program for creating Windows images for embedded devices: https://gith
 * support for specifying the minimum version of gnubox maker in the json file of the project, which will be automatically set to the current one when opening the project
 * to make the "screen_idle_time" parameter work
 * add support for creating 64-bit images for 32-bit UEFI (yes, for those very old intel atom tablets)
+* add support for custom kernels and device tree overlays to the program
+
+## bugs
+* HDMI audio does not work on orange pi zero 3 (it works on raspberry pi 64)
+* some messages from systemd are still sometimes visible even with quiet splash. also, if you put only quiet (without splash), you can see some tty messages (I consider this a CRITICAL problem since the essence of gnubox maker is to completely hide the OS from the user and leave only one application)
 
 ## supported platforms
 * x86_64 (BIOS, UEFI)
