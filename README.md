@@ -23,16 +23,15 @@ a similar program for creating Windows images for embedded devices: https://gith
 
 ## roadmap
 * gui with system settings and choice of platforms for export
-* x11 support (currently only wayland is supported)
 * support for comments in the json file of the project
-* support for specifying the minimum version of gnubox maker in the json file of the project, which will be automatically set to the current one when opening the project
-* to make the "screen_idle_time" parameter work
 * add support for creating 64-bit images for 32-bit UEFI (yes, for those very old intel atom tablets)
 * add support for custom kernels and device tree overlays to the program
 * increase the display time of the logo so that the user does not have to look at a black screen
 
 ## bugs
 * HDMI audio does not work on orange pi zero 3 (it works on raspberry pi 64)
+* "screen idle time" does not work on wayland
+* x11 mode does not work on Raspberry pi 64
 
 ## supported platforms
 * x86_64 (BIOS, UEFI)
