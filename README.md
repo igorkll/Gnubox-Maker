@@ -14,6 +14,7 @@ Gnubox maker secures the build from the project, which allows you to save the co
 as well as Gnubox maker projects can be controlled via git  
 The .img images for x86 / x86_64 that Gnubox maker generates are universal. they can be written to a USB drive or to a hard disk/SSD. also, when the device is turned on for the first time, the partition size will increase to the maximum possible (up to the entire available disk space) so that the OS can use all available space  
 a similar program for creating Windows images for embedded devices: https://github.com/igorkll/WinBox-Maker  
+ATTENTION. Starting from version 1.3.9, the kernels do not go with the program, but are assembled on the user's computer during installation. because of this, the installation can take a long time. up to several hours  
 
 ## installing
 * download the syslbuild release (NOT THE REPOSITORY BRANCH): https://github.com/igorkll/syslbuild/releases
@@ -30,8 +31,10 @@ a similar program for creating Windows images for embedded devices: https://gith
 
 ## bugs
 * HDMI audio does not work on orange pi zero 3 (it works on raspberry pi 64)
+* WIFI does not work on orange pi zero 3 (it works on raspberry pi 64)
 * "screen idle time" does not work on wayland
 * x11 mode does not work on Raspberry pi 64
+* there is a rather long loading time on the orange pi zero 3. This is due to the platform features. It may take ~20 seconds from the power supply to the appearance of your logo.
 
 ## supported platforms
 * x86_64 (BIOS, UEFI)
@@ -79,6 +82,12 @@ a similar program for creating Windows images for embedded devices: https://gith
 * output - the finished result of the build
 * .temp - temporary files used during the build process
 
+## devicetree
+you can create a custom devicetree to connect the perepherals
+* devicetree/PLATFORM_NAME/override.txt - you can specify overrides for .dtb/.dts here, specify a name without an extension
+* devicetree/PLATFORM_NAME/overlays.txt - here you can specify a list of overlays .dtbo/.dtso specify names without extension by separating the names with a line break
+* devicetree/PLATFORM_NAME - here you can add your .dtb and .dtbo files to the image. you can also add it here.dts and .dtso files and they will end up in the image as already compiled .dtb and .dtbo
+
 ## args
 * you can pass the path to the *.gnb file to gnubox maker and the build will happen automatically after which the program will terminate. The GUI will not appear
 
@@ -88,8 +97,8 @@ a similar program for creating Windows images for embedded devices: https://gith
 * "chroot" is executed in systemd-nspawn
 * Attention! since the gnubox maker projects are building from root in the host system, be careful what you build
 * despite the presence of command-line arguments for building via tty, gnubox maker must BE run from its working directory (otherwise it will not work)
-* there is a rather long loading time on the orange pi zero 3. This is due to the platform features. It may take ~20 seconds from the power supply to the appearance of your logo.
 * in order for GPU acceleration to work on raspberry pi 64, you need to select at least this debian version: trixie 20260217T143331Z. older versions have a Mesa version that is incompatible with the raspberry pi board
+* if you use boot splash, single-board computers will wait for framebuffer to appear when turned on and will not continue booting without a connected monitor.
 
 ## notes
 * please note that by default, the first time you turn on the created root image, the partition will be enlarged to the maximum possible size for the current media. this is done because I cannot know what size of drive the *.img image will be written to
@@ -102,6 +111,7 @@ a similar program for creating Windows images for embedded devices: https://gith
 * the real boot partition is mounted in the "/bootmnt" directory and is accessible from updatescript via the path "/updateroot/bootmnt"
 * if you use a separate data partition for data, it will be expanded the first time you turn it on, regardless of root_expand. the root_expand itself will be IGNORED and the root partition will NOT be expanded
 * the data partition is created with the ext4 filesystem in the /data directory
+* to build gnubox maker from source after cloning the repository, run "prepair.sh ". this is necessary to build a default kernel.
 
 ## what should I do if the project build fails?
 * make sure that EACH of your chroot scripts creates a /.chrootend file at the end
