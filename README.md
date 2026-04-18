@@ -88,6 +88,11 @@ you can create a custom devicetree to connect the perepherals
 * devicetree/PLATFORM_NAME/overlays.txt - here you can specify a list of overlays .dtbo/.dtso specify names without extension by separating the names with a line break
 * devicetree/PLATFORM_NAME - here you can add your .dtb and .dtbo files to the image. you can also add it here.dts and .dtso files and they will end up in the image as already compiled .dtb and .dtbo
 
+## startup sound modes
+* none - the power-on sound is not used
+* init - It plays the sound as early as possible. almost immediately after downloading the audio driver. ideal for devices without a screen like Bluetooth speakers.
+* logo - It plays a sound when the download logo appears. It ONLY works with "boot_splash" enabled AND DOES NOT WORK on devices without a screen.
+
 ## args
 * you can pass the path to the *.gnb file to gnubox maker and the build will happen automatically after which the program will terminate. The GUI will not appear
 
@@ -99,6 +104,7 @@ you can create a custom devicetree to connect the perepherals
 * despite the presence of command-line arguments for building via tty, gnubox maker must BE run from its working directory (otherwise it will not work)
 * in order for GPU acceleration to work on raspberry pi 64, you need to select at least this debian version: trixie 20260217T143331Z. older versions have a Mesa version that is incompatible with the raspberry pi board
 * if you use boot splash, single-board computers will wait for framebuffer to appear when turned on and will not continue booting without a connected monitor.
+* DO NOT USE "boot_splash" on devices without a screen. Since on some platforms the initialization script will wait for the framebuffer to appear so that the user sees the logo, as a result, the device will not start at all. You can use startup sound in init mode, for example, to inform the user that the device's power is on.
 
 ## notes
 * please note that by default, the first time you turn on the created root image, the partition will be enlarged to the maximum possible size for the current media. this is done because I cannot know what size of drive the *.img image will be written to
@@ -112,6 +118,8 @@ you can create a custom devicetree to connect the perepherals
 * if you use a separate data partition for data, it will be expanded the first time you turn it on, regardless of root_expand. the root_expand itself will be IGNORED and the root partition will NOT be expanded
 * the data partition is created with the ext4 filesystem in the /data directory
 * to build gnubox maker from source after cloning the repository, run "prepair.sh ". this is necessary to build a default kernel.
+* the "separate_data_partition_home_link" parameters make the /home and /root directories symlinks to their copies in the /data section. it only works with "separate_data_partition" enabled
+* the "separate_data_partition_var_link" parameter makes the /var directory a symlink to its copy in /data. it only works with "separate_data_partition" enabled and automatically turns "var_is_temp" off
 
 ## what should I do if the project build fails?
 * make sure that EACH of your chroot scripts creates a /.chrootend file at the end
