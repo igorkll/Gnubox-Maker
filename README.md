@@ -9,7 +9,7 @@ Gnubox Maker creates a special Linux system for a single application. After laun
 By default, Gnubox maker provides a completely clean loading screen (with your logo optional) and the complete inability to exit the application embedded in the image  
 Gnubox maker is ideally suited for: household appliances, ATM, car radios, smart home control panels  
 wherever you need a closed linux for one application, Gnubox maker will be an ideal option for generating an image for a ready-made device  
-A minimum of 60 GB of free space on a PC is recommended for using Gnubox maker  
+A minimum of 100 GB of free space on a PC is recommended for using Gnubox maker  
 Gnubox maker secures the build from the project, which allows you to save the configuration and repeat the build of the system  
 as well as Gnubox maker projects can be controlled via git  
 The .img images for x86 / x86_64 that Gnubox maker generates are universal. they can be written to a USB drive or to a hard disk/SSD. also, when the device is turned on for the first time, the partition size will increase to the maximum possible (up to the entire available disk space) so that the OS can use all available space  
@@ -25,12 +25,11 @@ ATTENTION. Starting from version 1.3.9, the kernels do not go with the program, 
 ## roadmap
 * gui with system settings and choice of platforms for export
 * add support for creating 64-bit images for 32-bit UEFI (yes, for those very old intel atom tablets)
-* add support for custom kernels and device tree overlays to the program
+* add support for custom kernels
 * increase the display time of the logo so that the user does not have to look at a black screen
 
 ## bugs
 * HDMI audio does not work on orange pi zero 3 (it works on raspberry pi 64)
-* WIFI does not work on orange pi zero 3 and raspberry pi
 * "screen idle time" does not work on wayland
 * x11 mode does not work on Raspberry pi 64
 * there is a rather long loading time on the orange pi zero 3. This is due to the platform features. It may take ~20 seconds from the power supply to the appearance of your logo.
@@ -65,7 +64,10 @@ ATTENTION. Starting from version 1.3.9, the kernels do not go with the program, 
 ## platforms support rate (from 0 to 10)
 * x86 - 9/10
 * raspberry pi 64 - 7/10
-* orange pi zero 3 - 4/10
+* orange pi zero 3 - 5/10
+
+## examples with a work network
+* gnuboxmaker_examples/testingbash
 
 ## used kernel patches (from https://github.com/igorkll/linux-embedded-patchs)
 * disable_vt_swithing_from_keyboard.patch - prevents the possibility of switching VT from the keyboard
