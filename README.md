@@ -1,4 +1,4 @@
-# Gnubox maker (BETA)
+# Gnubox maker (The GUI is not finished)
 ![preview](https://raw.githubusercontent.com/igorkll/Gnubox-Maker/refs/heads/main/preview.png)  
 the easiest way is to create an embedded/kiosk linux distribution with a single application that cannot be exited  
 it uses a patched linux kernel, which prevents switching VT and using ctrl+alt+del  
@@ -15,12 +15,25 @@ as well as Gnubox maker projects can be controlled via git
 The .img images for x86 / x86_64 that Gnubox maker generates are universal. they can be written to a USB drive or to a hard disk/SSD. also, when the device is turned on for the first time, the partition size will increase to the maximum possible (up to the entire available disk space) so that the OS can use all available space  
 a similar program for creating Windows images for embedded devices: https://github.com/igorkll/WinBox-Maker  
 ATTENTION. Starting from version 1.3.9, the kernels do not go with the program, but are assembled on the user's computer during installation. because of this, the installation can take a long time. up to several hours  
+if your task requires an even simpler program, you can consider mkbootable: https://github.com/igorkll/mkbootable  
+If you don't have enough gnubox maker features or you need a minimum image size, you can go down a level and use syslbuild directly: https://github.com/igorkll/syslbuild  
+
+## subprojects
+* syslbuild (main) - a low-level build system for custom linux distributions: https://github.com/igorkll/syslbuild
+* Gnubox maker - the simplest way to create kiosk/appliance builds of gnu/linux: https://github.com/igorkll/Gnubox-Maker
+* mkbootable - an even easier way to make a kiosk/single application gnu/linux: https://github.com/igorkll/mkbootable
 
 ## installing
 * download the syslbuild release (NOT THE REPOSITORY BRANCH): https://github.com/igorkll/syslbuild/releases
 * unpack it in a convenient place
 * launch install.sh from root
+* wait for the installation process to finish (it can take up to 4 hours)
 * the unpacked files can now be deleted
+### supported host systems
+recommended OS: Ubuntu 24.04 LTS (Noble Numbat)  
+* debian
+* ubuntu
+* linux mint
 
 ## roadmap
 * gui with system settings and choice of platforms for export
@@ -32,19 +45,17 @@ ATTENTION. Starting from version 1.3.9, the kernels do not go with the program, 
 * HDMI audio does not work on orange pi zero 3 (it works on raspberry pi 64)
 * "screen idle time" does not work on wayland
 * x11 mode does not work on Raspberry pi 64
-* there is a rather long loading time on the orange pi zero 3. This is due to the platform features. It may take ~20 seconds from the power supply to the appearance of your logo.
 * startup sound doesn't work
+* wifi is not working on orange pi zero 3
+* gpu is not working on orange pi zero 3
 
 ## supported platforms
 * x86_64 (BIOS, UEFI)
 * x86 (BIOS, UEFI)
 * orange pi zero 3
 * raspberry pi 5/4/3 (i tested this on raspberry pi 5, but in theory the image created via raspberry pi 64 should work on 5/4/3)
-
-## supported host systems
-* debian
-* ubuntu
-* linux mint
+if the platform you need is not available in gnubox maker, you can use syslbuild (a lower-level tool for creating embedded linux builds) where you can customize the build for any hardware you are interested in and do anything with the system  
+alternatively, you can fork gnubox maker and then offer a pull request  
 
 ## projects used
 * syslbuild: https://github.com/igorkll/syslbuild
@@ -63,11 +74,8 @@ ATTENTION. Starting from version 1.3.9, the kernels do not go with the program, 
 
 ## platforms support rate (from 0 to 10)
 * x86 - 9/10
-* raspberry pi 64 - 7/10
-* orange pi zero 3 - 5/10
-
-## examples with a work network
-* gnuboxmaker_examples/testingbash
+* raspberry pi 64 - 8/10
+* orange pi zero 3 - 4/10
 
 ## used kernel patches (from https://github.com/igorkll/linux-embedded-patchs)
 * disable_vt_swithing_from_keyboard.patch - prevents the possibility of switching VT from the keyboard
@@ -77,6 +85,8 @@ ATTENTION. Starting from version 1.3.9, the kernels do not go with the program, 
 * disable_keyboard_echo_by_default.patch - prevents typing characters on the screen from the keyboard before launching plymouth
 * disable_tty_control_flow.patch - disables control flow in the kernel
 * disable_tty_signals.patch - disables tty signals in the kernel
+* disable_reboot_and_shutdown_emerg_messages.patch - disables the output of shutdown/reboot messages.
+* make_all_emerg_messages_with_alert_loglevel.patch - makes all EMERG messages with loglevel alert so that they can be stopped using loglevel=0
 
 ## project structure
 * gnubox.gnb - the main file
@@ -98,7 +108,22 @@ you can create a custom devicetree to connect the perepherals
 ## startup sound modes
 * none - the power-on sound is not used
 * init - It plays the sound as early as possible. almost immediately after downloading the audio driver. ideal for devices without a screen like Bluetooth speakers.
-* logo - It plays a sound when the download logo appears. It ONLY works with "boot_splash" enabled AND DOES NOT WORK on devices without a screen.
+* logo - It plays a sound when the load logo appears. It ONLY works with "boot_splash" enabled AND DOES NOT WORK on devices without a screen.
+
+## how self-update works
+The update itself allows you to update the device's firmware automatically using the same .img image that gnubox maker exports  
+in order for the self-update function to be available to you, make sure that the "allow_updatescript" flag is set in the project configuration  
+to start the self-update, you need to call the /self_update.sh script with root rights and pass him the path to the .img file  
+if your shell runs as root, then this will not be a problem. if not, you can come up with your own way to increase privileges  
+for example, you can use a daemon running from root that will monitor a special path for the presence of an update file  
+alternatively, you can use a SUID binary that will accept the update file, validate it, and if everything is fine, then run a self-update (be careful with SUID)  
+keep in mind that the script itself /self_update.sh It DOES NOT VALIDATE the incoming .img file at ALL  
+he just assumes that the .img that you passed to /self_update.sh is the same .img that you recorded on the device and that it is suitable for this device  
+please note that the bootloader will not be affected during the self-update  
+also for launching /self_update.sh an .img file passed as a path to /self_update.sh must be located on the "DATA" section  
+using the script /self_update.sh it is impossible without a separate DATA section enabled. this script will not be in rootfs at all in this case  
+when self-updating, only the "BOOT" and "rootfs" sections are updated. also note that gnubox maker uses "BOOT" ONLY on single-board computers. on x86, there is an EFI partition (if the image is EFI-enabled), but it is not updated using self-update because it refers to the bootloader.  
+please note that the partition sizes CANNOT be increased during the update. therefore, when building the first image, reserve enough space for future updates using "minsize_root_partition" and "minsize_boot_partition" or "size_boot_partition" and "size_root_partition"  
 
 ## args
 * you can pass the path to the *.gnb file to gnubox maker and the build will happen automatically after which the program will terminate. The GUI will not appear
@@ -112,12 +137,13 @@ you can create a custom devicetree to connect the perepherals
 * in order for GPU acceleration to work on raspberry pi 64, you need to select at least this debian version: trixie 20260217T143331Z. older versions have a Mesa version that is incompatible with the raspberry pi board
 * if you use boot splash, single-board computers will wait for framebuffer to appear when turned on and will not continue booting without a connected monitor.
 * DO NOT USE "boot_splash" on devices without a screen. Since on some platforms the initialization script will wait for the framebuffer to appear so that the user sees the logo, as a result, the device will not start at all. You can use startup sound in init mode, for example, to inform the user that the device's power is on.
+* during the build, a lot is downloaded from the Internet. The assembly will not work without a network connection
 
 ## notes
 * please note that by default, the first time you turn on the created root image, the partition will be enlarged to the maximum possible size for the current media. this is done because I cannot know what size of drive the *.img image will be written to
 * by default, the allow_updatescript feature from custom-debian-init-script is enabled. to understand how it works, read this: https://github.com/igorkll/custom-debian-initramfs-init
 * if your script is runshell.sh when is completed, it will automatically restart. (not working in session mode "init")
-* It is always necessary to reboot and turn off the device from the you shell via "shutdown --no-wall now" and "shutdown --no-wall -r now", the --no-wall argument is REQUIRED so that the shutdown process is not visible when turned off.
+* gnubox maker uses a hook on the shutdown/reboot/poweroff commands to use the --no-wall argument and the user does not see the shutdown message. however, if your shell does shutdown/reboot in a different way instead of launching shutdown/reboot/poweroff in the console, the user will still see the wall message, and you yourself must prevent this.
 * the /var directory is mounted as tmpfs
 * The .img images for x86 / x86_64 that Gnubox maker generates are universal. they can be written to a USB drive or to a hard disk/SSD.
 * if session_mode init is set then runshell.sh in fact, it will be an init system, you do everything yourself. and it will always be run from root
