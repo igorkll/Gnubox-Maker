@@ -56,6 +56,7 @@ recommended OS: Ubuntu 24.04 LTS (Noble Numbat)
 * raspberry pi 5/4/3 (i tested this on raspberry pi 5, but in theory the image created via raspberry pi 64 should work on 5/4/3)
 if the platform you need is not available in gnubox maker, you can use syslbuild (a lower-level tool for creating embedded linux builds) where you can customize the build for any hardware you are interested in and do anything with the system  
 alternatively, you can fork gnubox maker and then offer a pull request  
+* 32 bit arm and rpi_32 NOT SUPPORTED IN THE MOMENT
 
 ## projects used
 * syslbuild: https://github.com/igorkll/syslbuild
@@ -75,7 +76,7 @@ alternatively, you can fork gnubox maker and then offer a pull request
 
 ## platforms support rate (from 0 to 10)
 * x86 - 9/10
-* raspberry pi 64 - 8/10
+* raspberry pi 64 - 9/10
 * orange pi zero 3 - 4/10
 
 ## used kernel patches (from https://github.com/igorkll/linux-embedded-patchs)
@@ -99,6 +100,8 @@ alternatively, you can fork gnubox maker and then offer a pull request
 * resources/logo.png - the logo that will be used when bootloading with splash enabled
 * resources/logo_updating.png - the logo that will be used when updating with splash enabled
 * resources/startup.wav - the sound that will be used during the download. requires configuration with a special parameter in the project. turned off by default
+* resources/rpi_32_config_extension.txt - configuration extensions for RPI 32
+* resources/rpi_64_config_extension.txt - configuration extensions for RPI 64
 * output - the finished result of the build
 * .temp - temporary files used during the build process
 
@@ -141,6 +144,7 @@ please note that the partition sizes CANNOT be increased during the update. ther
 * if you use boot splash, single-board computers will wait for framebuffer to appear when turned on and will not continue booting without a connected monitor.
 * DO NOT USE "boot_splash" on devices without a screen. Since on some platforms the initialization script will wait for the framebuffer to appear so that the user sees the logo, as a result, the device will not start at all. You can use startup sound in init mode, for example, to inform the user that the device's power is on.
 * during the build, a lot is downloaded from the Internet. The assembly will not work without a network connection
+* in the system image built through gnubox maker, it is STRONGLY RECOMMENDED NOT to use the apt and dpkg package manager, much less update the system using them. There is a /self_update.sh mechanism for updating and to install applications on a ready-made embedded device, I recommend implementing flatpak
 
 ## notes
 * please note that by default, the first time you turn on the created root image, the partition will be enlarged to the maximum possible size for the current media. this is done because I cannot know what size of drive the *.img image will be written to
