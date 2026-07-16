@@ -31,6 +31,7 @@ If you don't have enough gnubox maker features or you need a minimum image size,
 * the unpacked files can now be deleted
 ### supported host systems
 recommended OS: Ubuntu 24.04 LTS (Noble Numbat)  
+tested on OS: linux mint
 * debian
 * ubuntu
 * linux mint
@@ -44,19 +45,18 @@ recommended OS: Ubuntu 24.04 LTS (Noble Numbat)
 ## bugs
 * HDMI audio does not work on orange pi zero 3 (it works on raspberry pi 64)
 * "screen idle time" does not work on wayland
-* x11 mode does not work on Raspberry pi 64
-* startup sound doesn't work
 * wifi is not working on orange pi zero 3
 * gpu is not working on orange pi zero 3
+* 32 bit arm and rpi_32 NOT SUPPORTED IN THE MOMENT
 
 ## supported platforms
 * x86_64 (BIOS, UEFI)
 * x86 (BIOS, UEFI)
 * orange pi zero 3
 * raspberry pi 5/4/3 (i tested this on raspberry pi 5, but in theory the image created via raspberry pi 64 should work on 5/4/3)
+* 32 bit arm and rpi_32 NOT SUPPORTED IN THE MOMENT
 if the platform you need is not available in gnubox maker, you can use syslbuild (a lower-level tool for creating embedded linux builds) where you can customize the build for any hardware you are interested in and do anything with the system  
 alternatively, you can fork gnubox maker and then offer a pull request  
-* 32 bit arm and rpi_32 NOT SUPPORTED IN THE MOMENT
 
 ## projects used
 * syslbuild: https://github.com/igorkll/syslbuild
@@ -64,6 +64,8 @@ alternatively, you can fork gnubox maker and then offer a pull request
 * embedded-plymouth: https://github.com/igorkll/embedded-plymouth
 * custom-debian-initramfs-init: https://github.com/igorkll/custom-debian-initramfs-init
 * linux-embedded-setup-scripts: https://github.com/igorkll/linux-embedded-setup-scripts
+* liamounts: https://github.com/igorkll/liamounts
+* super-kiosk-browser: https://github.com/igorkll/super-kiosk-browser
 
 ## what was disabled
 * ESC button in plymouth (plymouth source code patch)
@@ -95,11 +97,12 @@ alternatively, you can fork gnubox maker and then offer a pull request
 * resources - all project resources used during the build process
 * resources/files - files that will be copied to rootfs before executing chroot scripts. please note that all your files and directories from this directory will have rights 755 and belong to root, regardless of what rights they have during the build. this is necessary for repeatable assembly on different machines. if you need to change the permissions on the target system, use the "chroot" scripts.
 * resources/chroot - scripts executed inside a chroot in the system during the build process (not just a chroot, but a systemd-nspawn container) please note that at the end of each file you need to create an empty file or directory with the path "/.chrootend" otherwise the build will fail
+* resources/initramfs - you can add additional files directly to initramfs
 * resources/runshell.sh - the shell startup file. you can write a script directly in it if you use tty mode and you will just get console output, or you can run your application from it if you use wayland/x11
 * resources/preinit.sh - this script runs before the initialization system in the initramfs environment. at this point, the switch_root has not yet occurred and the real root is mounted in "/root"
 * resources/logo.png - the logo that will be used when bootloading with splash enabled
 * resources/logo_updating.png - the logo that will be used when updating with splash enabled
-* resources/startup.wav - the sound that will be used during the download. requires configuration with a special parameter in the project. turned off by default
+* resources/startup.wav - the sound that will be used during the booting. requires configuration with a special parameter in the project. turned off by default
 * resources/rpi_32_config_extension.txt - configuration extensions for RPI 32
 * resources/rpi_64_config_extension.txt - configuration extensions for RPI 64
 * output - the finished result of the build
@@ -113,7 +116,7 @@ you can create a custom devicetree to connect the perepherals
 
 ## startup sound modes
 * none - the power-on sound is not used
-* init - It plays the sound as early as possible. almost immediately after downloading the audio driver. ideal for devices without a screen like Bluetooth speakers.
+* init - It plays the sound as early as possible. almost immediately after loading the audio driver. ideal for devices without a screen like Bluetooth speakers.
 * logo - It plays a sound when the load logo appears. It ONLY works with "boot_splash" enabled AND DOES NOT WORK on devices without a screen.
 
 ## how self-update works
